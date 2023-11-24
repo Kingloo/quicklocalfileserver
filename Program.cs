@@ -121,18 +121,15 @@ namespace quicklocalfileserver
 				ApplicationName = "quicklocalfileserver"
 			});
 
-			webAppBuilder.WebHost.ConfigureLogging(static (ILoggingBuilder loggingBuilder) =>
+			webAppBuilder.Logging.ClearProviders();
+
+			webAppBuilder.Logging.SetMinimumLevel(LogLevel.Warning);
+
+			webAppBuilder.Logging.AddSimpleConsole(static (SimpleConsoleFormatterOptions simpleConsoleFormatterOptions) =>
 			{
-				loggingBuilder.ClearProviders();
-
-				loggingBuilder.SetMinimumLevel(LogLevel.Warning);
-
-				loggingBuilder.AddSimpleConsole(static (SimpleConsoleFormatterOptions simpleConsoleFormatterOptions) =>
-				{
-					simpleConsoleFormatterOptions.ColorBehavior = LoggerColorBehavior.Enabled;
-					simpleConsoleFormatterOptions.IncludeScopes = true;
-					simpleConsoleFormatterOptions.SingleLine = true;
-				});
+				simpleConsoleFormatterOptions.ColorBehavior = LoggerColorBehavior.Enabled;
+				simpleConsoleFormatterOptions.IncludeScopes = true;
+				simpleConsoleFormatterOptions.SingleLine = true;
 			});
 
 			webAppBuilder.WebHost.UseKestrel((KestrelServerOptions kestrelServerOptions) =>
