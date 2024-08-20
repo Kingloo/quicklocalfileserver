@@ -16,19 +16,13 @@ namespace quicklocalfileserver
 	{
 		private const int defaultPort = 12_000;
 		private static readonly string defaultDirectory = AppContext.BaseDirectory;
+		private static CancellationTokenSource cts = new CancellationTokenSource();
 		
 		public static async Task<int> Main(string[] args)
 		{
 			ArgumentNullException.ThrowIfNull(args);
 
-			CancellationTokenSource cts = new CancellationTokenSource();
-
-			Console.CancelKeyPress += (object? _, ConsoleCancelEventArgs e) =>
-			{
-				e.Cancel = true;
-
-				cts.Cancel();
-			};
+			Console.CancelKeyPress += OnCancelPress;
 
 			int port = GetPort(args);
 			string directory = GetDirectory(args);
@@ -45,12 +39,21 @@ namespace quicklocalfileserver
 			}
 			finally
 			{
+				Console.CancelKeyPress -= OnCancelPress;
+
 				await webApplication.DisposeAsync().ConfigureAwait(false);
 
 				cts.Dispose();
 			}
 
 			return 0;
+		}
+
+		private static void OnCancelPress(object? sender, ConsoleCancelEventArgs e)
+		{
+			e.Cancel = true;
+
+			cts.Cancel();
 		}
 
 		private static int GetPort(string[] args)
